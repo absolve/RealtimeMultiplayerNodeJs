@@ -83,7 +83,7 @@
             this.intervalTargetDelta = Math.floor(1000 / this.intervalFramerate);
             this.intervalGameTick = setInterval(function () {
                 that.tick()
-            }, this.intervalTargetDelta);
+            }, this.intervalTargetDelta); //定时器
         },
 
         /**

@@ -33,25 +33,24 @@
 
         this.setDelegate(aDelegate);
         this.setupSocketIO();
-//		this.setupWSServer();
+        //		this.setupWSServer();
         this.setupCmdMap();
         return this;
     };
 
     RealtimeMultiplayerGame.network.ServerNetChannel.prototype = {
-        socketio: null,					// Socket.IO server
-        clients: null,					// SortedLookupTable
-        delegate: null,					// Should conform to ServerNetChannel delegate
-        outgoingSequenceNumber: 0,					// A unique ID for each message
-        cmdMap: {},					// Map the CMD constants to functions
+        socketio: null, // Socket.IO server
+        clients: null, // SortedLookupTable
+        delegate: null, // Should conform to ServerNetChannel delegate
+        outgoingSequenceNumber: 0, // A unique ID for each message
+        cmdMap: {}, // Map the CMD constants to functions
 
         // Methods
         /**
          * Initializes socket.io
          */
         setupSocketIO: function () {
-            var server = require('http').createServer(function (req, res) {
-            });
+            var server = require('http').createServer(function (req, res) {});
             server.listen(RealtimeMultiplayerGame.Constants.SERVER_SETTING.SOCKET_PORT);
             this.socketio = require('socket.io').listen(server);
 
@@ -61,18 +60,14 @@
                 that.socketio.set('log level', 1);
 
                 that.socketio.set('transports', [
-                    'websocket'
-                    , 'flashsocket'
-                    , 'htmlfile'
-                    , 'xhr-polling'
-                    , 'jsonp-polling'
+                    'websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling'
                 ]);
             });
 
             this.socketio.configure('development', function () {
                 that.socketio.set('transports', ['websocket']);
             });
-
+            //连接时候
             this.socketio.on('connection', function (socket) {
                 console.log(socket);
                 that.onSocketConnection(socket)
@@ -94,10 +89,10 @@
             var util = require('util');
             var ws = require("../lib/bonsai-ws/ws.js");
 
-            this.clientCount = 0;
-            this.maxClients = 8;
-            this.maxChars = 128;
-            this.socketClients = [];
+            this.clientCount = 0; //数量
+            this.maxClients = 8; //最大数量
+            this.maxChars = 128; //最大字符
+            this.socketClients = []; //socket列表
             var that = this;
 
             this.$ = new ws.Server(false);
@@ -105,7 +100,9 @@
                 var aClient = new RealtimeMultiplayerGame.network.Client(conn, that.getNextClientID());
 
                 // Send the first message back to the client, which gives them a clientid
-                var connectMessage = new RealtimeMultiplayerGame.model.NetChannelMessage(++this.outgoingSequenceNumber, aClient.getClientid(), true, RealtimeMultiplayerGame.Constants.CMDS.SERVER_CONNECT, { gameClock: that.delegate.getGameClock() });
+                var connectMessage = new RealtimeMultiplayerGame.model.NetChannelMessage(++this.outgoingSequenceNumber, aClient.getClientid(), true, RealtimeMultiplayerGame.Constants.CMDS.SERVER_CONNECT, {
+                    gameClock: that.delegate.getGameClock()
+                });
                 connectMessage.messageTime = that.delegate.getGameClock();
                 aClient.getConnection().json.send(RealtimeMultiplayerGame.modules.bison.encode(connectMessage));
 
@@ -178,7 +175,9 @@
             var aClient = new RealtimeMultiplayerGame.network.Client(clientConnection, this.getNextClientID());
 
             // Send the first message back to the client, which gives them a clientid
-            var connectMessage = new RealtimeMultiplayerGame.model.NetChannelMessage(++this.outgoingSequenceNumber, aClient.getClientid(), true, RealtimeMultiplayerGame.Constants.CMDS.SERVER_CONNECT, { gameClock: this.delegate.getGameClock() });
+            var connectMessage = new RealtimeMultiplayerGame.model.NetChannelMessage(++this.outgoingSequenceNumber, aClient.getClientid(), true, RealtimeMultiplayerGame.Constants.CMDS.SERVER_CONNECT, {
+                gameClock: this.delegate.getGameClock()
+            });
             connectMessage.messageTime = this.delegate.getGameClock();
             aClient.getConnection().json.send(connectMessage);
 
@@ -275,19 +274,12 @@
      * Required methods for the ServerNetChannel delegate
      */
     RealtimeMultiplayerGame.network.ServerNetChannelDelegateProtocol = {
-        setupCmdMap: function () {
-        },
-        shouldUpdatePlayer: function (clientID, data) {
-        },
-        shouldAddPlayer: function (clientID, data) {
-        },
-        shouldRemovePlayer: function (clientID) {
-        },
-        getNextEntityID: function () {
-        },
-        getGameClock: function () {
-        },
-        log: function () {
-        }
+        setupCmdMap: function () {},
+        shouldUpdatePlayer: function (clientID, data) {},
+        shouldAddPlayer: function (clientID, data) {},
+        shouldRemovePlayer: function (clientID) {},
+        getNextEntityID: function () {},
+        getGameClock: function () {},
+        log: function () {}
     }
 })();
